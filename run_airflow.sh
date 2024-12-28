@@ -7,7 +7,8 @@ SQL_ALCHEMY_CONN="sqlite:////opt/airflow/airflow.db"
 CONSTRAINTS_URL="https://raw.githubusercontent.com/apache/airflow/constraints-2.10.4/constraints-3.12.txt"
 
 # Docker Run コマンド
-docker run -d -p 8080:8080 \
+docker run -d --name airflow-webserver \
+  -p 8080:8080 \
   -e AIRFLOW__CORE__EXECUTOR=$EXECUTOR \
   -e AIRFLOW__CORE__DAGS_FOLDER=$DAGS_FOLDER \
   -e AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=$SQL_ALCHEMY_CONN \
