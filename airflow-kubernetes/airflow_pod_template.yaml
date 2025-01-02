@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: scheduler
+  template:
+    metadata:
+      labels:
+        component: scheduler
+    spec:
+      containers:
+        - name: scheduler
+          image: 664418998238.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-local-test:2.10.4-python3.12
+          resources:
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+          env:
+            - name: AIRFLOW__CORE__EXECUTOR
+              value: "KubernetesExecutor"
+            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+              value: "postgresql+psycopg2://airflow:airflow@postgres:5432/airflow_metadata"
+            - name: AIRFLOW__CORE__FERNET_KEY
+              value: "7otXSewF3EDIYwK3RAZz2cUu2aDGNUu8fN82ILsLjlM="
+      restartPolicy: Always

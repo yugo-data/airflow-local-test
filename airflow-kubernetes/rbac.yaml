@@ -11,23 +11,32 @@ metadata:
   namespace: default
 rules:
   - apiGroups: [""]
-    resources: ["pods", "pods/log", "pods/exec", "services", "endpoints"]
+    resources:
+      - "pods"
+      - "pods/log"
+      - "pods/exec"
+      - "services"
+      - "endpoints"
+      - "configmaps"
+      - "persistentvolumeclaims"
     verbs: ["get", "list", "create", "delete", "update", "patch", "watch"]
   - apiGroups: [""]
-    resources: ["persistentvolumeclaims"]
+    resources:
+      - "secrets"
     verbs: ["get", "list", "create", "delete", "update", "patch", "watch"]
   - apiGroups: ["apps"]
-    resources: ["deployments", "replicasets"]
+    resources:
+      - "deployments"
+      - "replicasets"
     verbs: ["get", "list", "create", "delete", "update", "patch", "watch"]
   - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["get", "list", "create", "delete", "update", "patch", "watch"]
-  - apiGroups: [""]
-    resources: ["secrets"]
-    verbs: ["get", "list", "create", "delete", "update", "patch", "watch"]
-  - apiGroups: [""]
-    resources: ["events"]
+    resources:
+      - "events"
     verbs: ["get", "list"]
+  - apiGroups: ["batch"]
+    resources:
+      - "jobs"
+    verbs: ["get", "list", "create", "delete", "update", "patch", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

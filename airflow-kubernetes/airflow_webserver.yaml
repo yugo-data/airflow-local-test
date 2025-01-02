@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-webserver
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: webserver
+  template:
+    metadata:
+      labels:
+        component: webserver
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret  # シークレット名を指定
+      containers:
+      - name: webserver
+        image: 664418998238.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-local-test:2.10.4-python3.12
+        args: ["webserver"] # デフォルトではWEBSWEVERが立ち上がるのでこのコマンドは不要だが明示化したいので記載
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "1"      # CPU制限を増加
+            memory: "2Gi"  # メモリ制限を増加
+          requests:
+            cpu: "500m"    # CPUリクエストを増加
+            memory: "1Gi"   # メモリリクエストを増加
+        env:
+        - name: AIRFLOW__CORE__EXECUTOR
+          value: "KubernetesExecutor"
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: "postgresql+psycopg2://airflow:airflow@postgres:5432/airflow_metadata"
+        - name: AIRFLOW__CORE__FERNET_KEY
+          value: "7otXSewF3EDIYwK3RAZz2cUu2aDGNUu8fN82ILsLjlM="
+        volumeMounts:
+        - name: dags-volume
+          mountPath: /opt/airflow/dags  # DAGのマウント先
+      volumes:
+      - name: dags-volume
+        persistentVolumeClaim:
+          claimName: airflow-dags-pvc  # PVCを指定

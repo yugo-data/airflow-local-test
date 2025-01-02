@@ -17,5 +17,5 @@ with DAG(
             task_id=f'task_{i}',
             bash_command='echo "Task $((RANDOM % 10 + 1)) running on $(hostname)" && sleep $((RANDOM % 5 + 1))',
         )
-        for i in range(10)  # タスク数を調整可能
+        for i in range(2)  # タスク数を調整可能
     ]

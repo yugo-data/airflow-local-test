@@ -2,11 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: airflow-webserver
+  namespace: default  # Namespaceを指定
 spec:
+  selector:
+    component: webserver  # Podのラベルに合わせる
   type: NodePort  # 必要に応じて ClusterIP または LoadBalancer に変更
   ports:
   - port: 8080
     targetPort: 8080
     nodePort: 30000  # 必要に応じて調整
-  selector:
-    app: airflow

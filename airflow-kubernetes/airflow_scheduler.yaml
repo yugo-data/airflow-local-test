@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: scheduler
+  template:
+    metadata:
+      labels:
+        component: scheduler
+    spec:
+      serviceAccountName: airflow-service-account
+      imagePullSecrets:
+        - name: ecr-secret  # シークレット名を指定
+      containers:
+      - name: scheduler
+        image: "664418998238.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-local-test:2.10.4-python3.12"
+        args: ["scheduler"] # デフォルトではWEBSWEVERが立ち上がるのでこのコマンドによりスケジューラを立てる
+        resources:
+          limits:
+            cpu: "1"          # CPUリミットを1CPUに設定
+            memory: "2Gi"     # メモリリミットを2Giに設定
+          requests:
+            cpu: "500m"       # 最低リクエストCPUを500mに設定
+            memory: "1Gi"     # 最低リクエストメモリを1Giに設定
+        env:
+        - name: AIRFLOW__CORE__EXECUTOR
+          value: "KubernetesExecutor"
+        - name: AIRFLOW__KUBERNETES__WORKER_CONTAINER_IMAGE
+          value: "664418998238.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-local-test:2.10.4-python3.12"
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: "postgresql+psycopg2://airflow:airflow@postgres:5432/airflow_metadata"
+        - name: AIRFLOW__CORE__FERNET_KEY
+          value: "7otXSewF3EDIYwK3RAZz2cUu2aDGNUu8fN82ILsLjlM="
+        volumeMounts:
+        - name: dags-volume
+          mountPath: /opt/airflow/dags  # DAGのマウント先
+      volumes:
+      - name: dags-volume
+        persistentVolumeClaim:
+          claimName: airflow-dags-pvc  # PVCを指定
